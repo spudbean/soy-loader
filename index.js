@@ -34,7 +34,7 @@ module.exports = function(source) {
 	// Grab namespace for shimming encapsulated module return value.
 	var extracted = /\{namespace\s+((\w+)[^\s]*).*\}/.exec(source);
 	var namespace = extracted[1];
-	var baseVar = extracted[2]
+	var baseVar = extracted[2];
 	var tempDir = path.resolve(__dirname, [
 		'soytemp', // directory prefix
 		Date.now(), // datestamp
@@ -46,7 +46,7 @@ module.exports = function(source) {
 
 		// Get the temp directory path
 		.then(function() {
-			dirPath = tempDir;
+            var dirPath = tempDir;
 			// Handle drive letters in windows environments (C:\)
 			if (dirPath.indexOf(':') !== -1) {
 				dirPath = dirPath.split(':')[1];
@@ -77,12 +77,12 @@ module.exports = function(source) {
 				!query.global ?
 					[
 						// Shims for encapsulating the compiled template.
-						'var ' + baseVar + ';',
+						'var ' + baseVar + ';'
 					]
 					:
 					[
 						"if (typeof global." + baseVar + " == 'undefined') { global." + baseVar + " = {}; }",
-						'var ' + baseVar + '= global.' + baseVar+ ';',
+						'var ' + baseVar + '= global.' + baseVar+ ';'
 					],
 				[
 					template,
