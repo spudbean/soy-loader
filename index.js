@@ -67,20 +67,27 @@ module.exports = function(source) {
 
 		// Return utils and module return value, shimmed for module encapsulation.
 		}).then(function(template) {
-			return loaderCallback(null, [
-				// Shims for encapsulating the soy runtime library. Normally these are exposed globally by
-				// including soyutils.js. Here we encapsulate them and require them in the template.
-				'var goog = ' + runtimeUtils + '.goog;',
-				'var soy = ' + runtimeUtils + '.soy;',
-				'var soydata = ' + runtimeUtils + '.soydata;',
-				'var soyshim = ' + runtimeUtils + '.soyshim;',
-
-				// Shims for encapsulating the compiled template.
-				'var ' + baseVar + ';',
-				template,
-				'module.exports = ' + namespace + ';'
-
-			].join('\n'));
+			return loaderCallback(null, [].concat([
+					// Shims for encapsulating the soy runtime library. Normally these are exposed globally by
+					// including soyutils.js. Here we encapsulate them and require them in the template.
+					'var goog = ' + runtimeUtils + '.goog;',
+					'var soy = ' + runtimeUtils + '.soy;',
+					'var soydata = ' + runtimeUtils + '.soydata;',
+					'var soyshim = ' + runtimeUtils + '.soyshim;'],
+				!query.global ?
+					[
+						// Shims for encapsulating the compiled template.
+						'var ' + baseVar + ';',
+					]
+					:
+					[
+						"if (typeof global." + baseVar + " == 'undefined') { global." + baseVar + " = {}; }",
+						'var ' + baseVar + '= global.' + baseVar+ ';',
+					],
+				[
+					template,
+					'module.exports = ' + namespace + ';'])
+				.join('\n'));
 		// Handle any errors
 		}).catch(function(e) {
 			return loaderCallback(e);
